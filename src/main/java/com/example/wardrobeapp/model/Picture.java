@@ -22,11 +22,5 @@ public class Picture {
     private File file;
 
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public Long getId() {
-        return id;
-    }
 }
