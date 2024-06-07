@@ -28,9 +28,5 @@ public class CustomerController {
       }
   }
 
-  @GetMapping("/getCustomer")
-    public ResponseEntity<String> getCustomer(){
-      return new ResponseEntity<>("Customer" + customerService.getUserByEmail("hans.zimmer@email.com").get().getPassword(), HttpStatus.OK);
-  }
   
 }
