@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.io.File;
 
 @Entity
-@Table(name = "Picture")
+@Table(name = "picture")
 public class Picture {
 
     @Id

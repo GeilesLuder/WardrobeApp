@@ -2,6 +2,7 @@ package com.example.wardrobeapp.controller;
 
 import com.example.wardrobeapp.model.Customer;
 import com.example.wardrobeapp.service.CustomerService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,11 @@ public class CustomerController {
       } else {
         return new ResponseEntity<String>("Login failed", HttpStatus.NOT_FOUND);
       }
+  }
+
+  @GetMapping("/getCustomer")
+    public ResponseEntity<String> getCustomer(){
+      return new ResponseEntity<>("Customer" + customerService.getUserByEmail("hans.zimmer@email.com").get().getPassword(), HttpStatus.OK);
   }
   
 }

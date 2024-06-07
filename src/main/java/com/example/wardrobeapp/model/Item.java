@@ -12,7 +12,7 @@ import lombok.Setter;
 // we do not want to delete a user if we delete a item that is related to that user
 // same for categories.
 @Entity
-@Table(name = "Item")
+@Table(name = "item")
 public class Item {
   
   //Private variable String name

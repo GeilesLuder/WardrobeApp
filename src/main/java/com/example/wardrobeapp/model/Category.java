@@ -9,7 +9,7 @@ import lombok.Setter;
 // getters setters obv
 // this is only a "lookup table" so we can link the items to a category, we should not need to change any of the data in this
 @Entity
-@Table(name = "Category")
+@Table(name = "category")
 public class Category {
 
   //private string variable name
