@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload View</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="container">
+    <div class="main-content-upload">
+        <h2>Upload Item</h2>
+        <div class="image-container">
+            <img
+                    id="item-image"
+                    src="placeholder.jpg"
+                    alt="Item Image"
+                    style="max-width: 100%; height: auto"
+            />
+        </div>
+        <input type="file" id="file-input" accept="image/*" />
+        <div class="category">
+            <span id="category-label">Category:</span>
+            <span id="category-name" contenteditable="true"
+            >Click to set category</span
+            >
+        </div>
+    </div>
+    <div class="action-bar">
+        <button onclick="uploadImage()">Upload</button>
+        <button onclick="snipImage()">Snip</button>
+        <button onclick="getCategory()">getCat</button>
+        <button onclick="saveItem()">Add</button>
+        <button class="delete-button" onclick="deleteItem()">
+            Discard
+        </button>
+    </div>
+</div>
+
+<script>
+    document
+        .getElementById("file-input")
+        .addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("item-image").src =
+                        e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+    function uploadImage() {
+        const fileInput = document.getElementById("file-input");
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append("image", file);
+
+        fetch("upload.php", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    alert("Image uploaded successfully!");
+                } else {
+                    throw new Error("Image upload failed!");
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("Image upload failed!");
+            });
+    }
+
+    function snipImage() {
+        alert("Snip Out");
+    }
+
+    function getCategory() {
+        alert("Get Category");
+    }
+
+    function saveItem() {
+        alert("Item Added");
+        window.location.href = "main.html"; // Return to main view
+    }
+
+    function deleteItem() {
+        window.location.href = "main.html"; // Return to main view without saving
+    }
+</script>
+</body>
+</html>
