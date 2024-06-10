@@ -46,53 +46,25 @@
         }
     }
 
-
-    function showItems(category) {
+    async function showItems(categoryId) {
         const itemsContainer = document.getElementById("items");
         itemsContainer.innerHTML = ""; // Clear current items
 
-        // Example items for each category
-        const items = {
-            bottoms: [
-                { name: "Jeans", image: "./test/jeans.jpg" },
-                { name: "Shorts", image: "./test/shorts.jpg" },
-            ],
-            tops: [
-                { name: "Top1", image: "./test/top1.jpg" },
-                { name: "Top2", image: "./test/top2.jpg" },
-                { name: "long shirt", image: "./test/top3.jpg" },
-                { name: "T-Shirt 1", image: "./test/top4.jpg" },
-            ],
-            dresses: [
-                {
-                    name: "Transparent",
-                    image: "./test/transparent.png",
-                },
-                { name: "Dress2", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-                { name: "Dress1", image: "" },
-            ],
-        };
+        try {
+            const response = await fetch(`http://localhost:8080/category/${categoryId}/user@example.com`);
+            const items = await response.json();
 
-        if (items[category]) {
-            items[category].forEach((item) => {
+            items.forEach(item => {
                 const itemElement = document.createElement("div");
                 itemElement.className = "item";
-                itemElement.innerHTML = `<img src="${item.image}" alt="${item.name}" class="item-img"/><div class="item-name">${item.name}</div>`;
+                itemElement.innerHTML = `
+                    <img src="${item.pictureUrl}" alt="${item.name}" class="item-img"/>
+                    <div class="item-name">${item.name}</div>`;
                 itemElement.onclick = () => editView(item);
                 itemsContainer.appendChild(itemElement);
             });
+        } catch (error) {
+            console.error('Error loading items:', error);
         }
     }
 
