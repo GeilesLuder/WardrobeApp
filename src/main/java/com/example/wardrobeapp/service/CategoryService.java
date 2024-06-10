@@ -21,9 +21,6 @@ public class CategoryService {
         Iterable<Category> all = categoryRepository.findAll();
         List<Category> categories = new ArrayList<>();
         all.iterator().forEachRemaining(categories::add);
-        for(int i = 0; i < categories.size(); i++) {
-            System.out.println(categories.get(i).getDescription() + " name: " + categories.get(i).getName());
-        }
         return categories;
     }
     //Getter for category by searching its name 
