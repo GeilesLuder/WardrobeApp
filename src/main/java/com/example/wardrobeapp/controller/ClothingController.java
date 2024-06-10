@@ -98,7 +98,7 @@ public class ClothingController {
             .body(resource);
   }
 
-  @GetMapping("/category/")
+  @GetMapping("/category")
   public ResponseEntity<List<Category>> getCategories() {
     return new ResponseEntity<>(categoryService.getAll(), HttpStatus.OK);
   }
