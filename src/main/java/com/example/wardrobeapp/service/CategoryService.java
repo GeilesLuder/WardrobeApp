@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 //@Service marks the class as Spring service component
@@ -18,7 +18,13 @@ public class CategoryService {
     
     //Getter for all categories
     public List<Category> getAll() {
-        return (List<Category>) categoryRepository.findAll();
+        Iterable<Category> all = categoryRepository.findAll();
+        List<Category> categories = new ArrayList<>();
+        all.iterator().forEachRemaining(categories::add);
+        for(int i = 0; i < categories.size(); i++) {
+            System.out.println(categories.get(i).getDescription() + " name: " + categories.get(i).getName());
+        }
+        return categories;
     }
     //Getter for category by searching its name 
     public Category getCategoryByName(String name) {

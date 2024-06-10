@@ -14,6 +14,7 @@ public class Category {
 
   //private string variable name
   @Setter
+  @Getter
   private String name;
 
 

@@ -1,4 +1,4 @@
-package com.example.wardrobeapp.cvConfig;
+package com.example.wardrobeapp.Config;
 
 import org.opencv.core.Core;
 import org.springframework.context.annotation.Configuration;

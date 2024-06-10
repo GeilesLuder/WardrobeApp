@@ -28,7 +28,7 @@
     // Function for loading the Categories from the Backend
     async function loadCategories(){
         try {
-            const response = await fetch('/category'); //URL of the Backend Route
+            const response = await fetch('http://localhost:8080/category'); //URL of the Backend Route
             const categories = await response.json();
             const categoryList = document.getElementById('category-list');
             categoryList.innerHTML = ''; // delete previous categories

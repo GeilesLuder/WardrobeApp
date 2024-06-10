@@ -24,7 +24,7 @@ public class CustomerController {
       if (customerService.loginUser(customer.getEmail(), customer.getPassword())) {
         return new ResponseEntity<String>("Login successful", HttpStatus.OK);
       } else {
-        return new ResponseEntity<String>("Login failed", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<String>("Login failed", HttpStatus.UNAUTHORIZED);
       }
   }
 

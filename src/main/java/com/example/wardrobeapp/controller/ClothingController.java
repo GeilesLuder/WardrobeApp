@@ -100,6 +100,7 @@ public class ClothingController {
 
   @GetMapping("/category")
   public ResponseEntity<List<Category>> getCategories() {
+
     return new ResponseEntity<>(categoryService.getAll(), HttpStatus.OK);
   }
 
