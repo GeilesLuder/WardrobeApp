@@ -67,6 +67,7 @@
             })
             .then(data => {
                 console.log(data); // Optional: Log the response for debugging
+                localStorage.setItem('userEmail', email); // Save email to local storage
                 window.location.href = 'main.html';
             })
             .catch(error => {

@@ -25,19 +25,28 @@
 </div>
 
 <script>
-    // Function for loading the Categories from the Backend
+    const userEmail = localStorage.getItem('userEmail');
+
+    if (!userEmail) {
+        console.error('User email not found in local storage.');
+        window.location.href = 'index.html'; // Redirect to login if userEmail is not found
+    }
+
     async function loadCategories(){
         try {
-            const response = await fetch('http://localhost:8080/category'); //URL of the Backend Route
+            const response = await fetch('http://localhost:8080/category');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const categories = await response.json();
             const categoryList = document.getElementById('category-list');
-            categoryList.innerHTML = ''; // delete previous categories
+            categoryList.innerHTML = ''; // Clear previous categories
             categories.forEach(category => {
                 const listItem = document.createElement('li');
                 const link = document.createElement('a');
                 link.href = '#';
                 link.textContent = category.name;
-                link.onclick = () => showItems(category.id); // click-handler for Categories
+                link.onclick = () => showItems(category.id);
                 listItem.appendChild(link);
                 categoryList.appendChild(listItem);
             });
@@ -46,20 +55,30 @@
         }
     }
 
-    async function showItems(categoryId) {
+    async function showItems(customerMail) {
+        console.log('User email:', customerMail); // Debug log
+        if (!customerMail) {
+            console.error('User email is undefined.');
+            return;
+        }
+
         const itemsContainer = document.getElementById("items");
         itemsContainer.innerHTML = ""; // Clear current items
 
         try {
-            const response = await fetch(`http://localhost:8080/category/${categoryId}/user@example.com`);
+            const response = await fetch(`http://localhost:8080/items/${customerMail}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const items = await response.json();
+            console.log('Fetched items:', items); // Debug log
 
             items.forEach(item => {
                 const itemElement = document.createElement("div");
                 itemElement.className = "item";
                 itemElement.innerHTML = `
-                    <img src="${item.pictureUrl}" alt="${item.name}" class="item-img"/>
-                    <div class="item-name">${item.name}</div>`;
+                <img src="${item.pictureUrl}" alt="${item.name}" class="item-img"/>
+                <div class="item-name">${item.name}</div>`;
                 itemElement.onclick = () => editView(item);
                 itemsContainer.appendChild(itemElement);
             });
@@ -69,7 +88,7 @@
     }
 
     function addItem() {
-        window.location.href = "upload.html"; // Navigate to upload view
+        window.location.href = "upload.html";
     }
 
     function editView(item) {
@@ -77,11 +96,13 @@
     }
 
     function logout() {
+        localStorage.removeItem('userEmail');
         window.location.href = "index.html";
     }
 
-    // load Categories by loading the page
     window.onload = loadCategories;
 </script>
 </body>
 </html>
+
+
