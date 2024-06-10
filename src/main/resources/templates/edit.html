@@ -4,8 +4,103 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Edit Item</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<h1>Edit</h1>
+<div class="container">
+    <div class="main-content-upload">
+        <h2>Edit Item</h2>
+        <div class="image-container">
+            <img
+                    id="item-image"
+                    src="placeholder.jpg"
+                    alt="Item Image"
+                    style="max-width: 100%; height: auto"
+            />
+        </div>
+        <input type="file" id="file-input" accept="image/*" />
+        <div class="category">
+            <span id="category-label">Category:</span>
+            <span id="category-name" contenteditable="true"></span>
+        </div>
+    </div>
+    <div class="action-bar">
+        <button onclick="uploadImage()">Upload</button>
+        <button onclick="snipImage()">Snip</button>
+        <button onclick="getCategory()">Get Category</button>
+        <button onclick="saveChanges()">Save Changes</button>
+        <button class="delete-button" onclick="deleteItem()">Delete</button>
+    </div>
+</div>
+
+<script>
+    // This function will be called when the page loads to populate the current item data
+    function loadItemData() {
+        const item = JSON.parse(localStorage.getItem('currentItem')); // Retrieve item data from localStorage
+
+        if (item) {
+            document.getElementById('item-image').src = item.image || 'placeholder.jpg';
+            document.getElementById('category-name').textContent = item.category || 'Click to set category';
+        }
+    }
+
+    document
+        .getElementById("file-input")
+        .addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("item-image").src =
+                        e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+    function uploadImage() {
+        const fileInput = document.getElementById("file-input");
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append("image", file);
+
+        fetch("upload.php", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    alert("Image uploaded successfully!");
+                } else {
+                    throw new Error("Image upload failed!");
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("Image upload failed!");
+            });
+    }
+
+    function snipImage() {
+        alert("Snip Out");
+    }
+
+    function getCategory() {
+        alert("Get Category");
+    }
+
+    function saveChanges() {
+        alert("Changes saved");
+        window.location.href = "main.html"; // Return to main view
+    }
+
+    function deleteItem() {
+        alert("Item deleted");
+        window.location.href = "main.html"; // Return to main view
+    }
+
+    window.onload = loadItemData;
+</script>
 </body>
 </html>
+
