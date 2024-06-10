@@ -6,10 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.wardrobeapp.model.Customer;
-import com.example.wardrobeapp.model.Item;
-import com.example.wardrobeapp.model.Picture;
-import com.example.wardrobeapp.model.ResponseMessage;
+import com.example.wardrobeapp.model.*;
 import com.example.wardrobeapp.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -101,7 +98,10 @@ public class ClothingController {
             .body(resource);
   }
 
-
+  @GetMapping("/category/")
+  public ResponseEntity<List<Category>> getCategories() {
+    return new ResponseEntity<>(categoryService.getAll(), HttpStatus.OK);
+  }
 
 
   
