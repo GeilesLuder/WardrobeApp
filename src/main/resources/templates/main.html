@@ -10,14 +10,8 @@
 <div class="container">
     <div class="sidebar">
         <h2>Categories</h2>
-        <ul>
-            <li>
-                <a href="#" onclick="showItems('bottoms')">Bottoms</a>
-            </li>
-            <li><a href="#" onclick="showItems('tops')">Tops</a></li>
-            <li>
-                <a href="#" onclick="showItems('dresses')">Dresses</a>
-            </li>
+        <ul id="category-list">
+            <!-- Categories get inserted here dynamically -->
         </ul>
     </div>
     <div class="topbar">
@@ -31,6 +25,28 @@
 </div>
 
 <script>
+    // Function for loading the Categories from the Backend
+    async function loadCategories(){
+        try {
+            const response = await fetch('/category'); //URL of the Backend Route
+            const categories = await response.json();
+            const categoryList = document.getElementById('category-list');
+            categoryList.innerHTML = ''; // delete previous categories
+            categories.forEach(category => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = '#';
+                link.textContent = category.name;
+                link.onclick = () => showItems(category.id); // click-handler for Categories
+                listItem.appendChild(link);
+                categoryList.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error('Error loading categories:', error);
+        }
+    }
+
+
     function showItems(category) {
         const itemsContainer = document.getElementById("items");
         itemsContainer.innerHTML = ""; // Clear current items
@@ -91,6 +107,9 @@
     function logout() {
         window.location.href = "index.html";
     }
+
+    // load Categories by loading the page
+    window.onload = loadCategories;
 </script>
 </body>
 </html>
