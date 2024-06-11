@@ -56,36 +56,42 @@
     }
 
     async function showItems(categoryId) {
-        console.log('Category ID:', categoryId); // Debug log
-        if (!categoryId || !userEmail) {
-            console.error('Category ID or user email is undefined.');
-            return;
-        }
-
         const itemsContainer = document.getElementById("items");
         itemsContainer.innerHTML = ""; // Clear current items
 
         try {
-            const response = await fetch(`http://localhost:8080/category/${categoryId}/${userEmail}`);
+            const response = await fetch(`http://localhost:8080/category/{{categoryId}}/{{customerMail}}`);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error("Failed to fetch items");
             }
-            const items = await response.json();
-            console.log('Fetched items:', items); // Debug log
 
-            items.forEach(item => {
+            const items = await response.json();
+
+            for (const item of items) {
+                const itemImageResponse = await fetch(`http://localhost:8080/download/{{itemId}}`);
+                if (!itemImageResponse.ok) {
+                    throw new Error(`Failed to fetch image for item ${item.id}`);
+                }
+
+                const itemImageUrl = URL.createObjectURL(await itemImageResponse.blob());
+
                 const itemElement = document.createElement("div");
                 itemElement.className = "item";
                 itemElement.innerHTML = `
-                <img src="${item.pictureUrl}" alt="${item.name}" class="item-img"/>
+                <img src="${itemImageUrl}" alt="${item.name}" class="item-img"/>
                 <div class="item-name">${item.name}</div>`;
                 itemElement.onclick = () => editView(item);
                 itemsContainer.appendChild(itemElement);
-            });
+            }
         } catch (error) {
-            console.error('Error loading items:', error);
+            console.error("Error:", error);
+            alert("Failed to load items");
         }
     }
+
+
+
+
 
     function addItem() {
         window.location.href = "upload.html";

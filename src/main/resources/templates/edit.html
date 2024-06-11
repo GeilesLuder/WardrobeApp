@@ -11,96 +11,126 @@
     <div class="main-content-upload">
         <h2>Edit Item</h2>
         <div class="image-container">
-            <img
-                    id="item-image"
-                    src="placeholder.jpg"
-                    alt="Item Image"
-                    style="max-width: 100%; height: auto"
-            />
+            <img id="item-image" src="placeholder.jpg" alt="Item Image" style="max-width: 100%; height: auto" />
         </div>
         <input type="file" id="file-input" accept="image/*" />
-        <div class="category">
-            <span id="category-label">Category:</span>
-            <span id="category-name" contenteditable="true"></span>
+        <div class="input-group">
+            <label for="category-name">Category:</label>
+            <span id="category-name" contenteditable="true">Click to set category</span>
+        </div>
+        <div class="input-group">
+            <label for="item-name-input">Item Name:</label>
+            <input type="text" id="item-name-input" placeholder="Enter item name" />
         </div>
     </div>
     <div class="action-bar">
-        <button onclick="uploadImage()">Upload</button>
         <button onclick="snipImage()">Snip</button>
         <button onclick="getCategory()">Get Category</button>
         <button onclick="saveChanges()">Save Changes</button>
-        <button class="delete-button" onclick="deleteItem()">Delete</button>
+        <button onclick="deleteItem()">Delete</button>
+        <button class="delete-button" onclick="discard()">Discard</button>
     </div>
 </div>
 
 <script>
-    // This function will be called when the page loads to populate the current item data
-    function loadItemData() {
-        const item = JSON.parse(localStorage.getItem('currentItem')); // Retrieve item data from localStorage
-
-        if (item) {
-            document.getElementById('item-image').src = item.image || 'placeholder.jpg';
-            document.getElementById('category-name').textContent = item.category || 'Click to set category';
+    document.getElementById("file-input").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("item-image").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
-    }
-
-    document
-        .getElementById("file-input")
-        .addEventListener("change", function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById("item-image").src =
-                        e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-    function uploadImage() {
-        const fileInput = document.getElementById("file-input");
-        const file = fileInput.files[0];
-        const formData = new FormData();
-        formData.append("image", file);
-
-        fetch("upload.php", {
-            method: "POST",
-            body: formData,
-        })
-            .then((response) => {
-                if (response.ok) {
-                    alert("Image uploaded successfully!");
-                } else {
-                    throw new Error("Image upload failed!");
-                }
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                alert("Image upload failed!");
-            });
-    }
+    });
 
     function snipImage() {
         alert("Snip Out");
     }
 
     function getCategory() {
-        alert("Get Category");
+        document.getElementById("category-name").innerText = "Clothing";
     }
 
-    function saveChanges() {
-        alert("Changes saved");
-        window.location.href = "main.html"; // Return to main view
+    function discard() {
+        window.location.href = "main.html"; // Return to main view without saving
+    }
+
+    async function saveChanges() {
+        const fileInput = document.getElementById("file-input");
+        const file = fileInput.files[0];
+        const itemName = document.getElementById("item-name-input").value;
+        const categoryName = document.getElementById("category-name").innerText;
+        const userEmail = localStorage.getItem('userEmail');
+
+        if (!file || !itemName || !categoryName) {
+            alert("Please fill out all fields and select an image.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("itemName", itemName);
+        formData.append("categoryName", categoryName);
+
+        try {
+            const uploadResponse = await fetch(`http://localhost:8080/upload/${userEmail}`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error("Failed to upload file");
+            }
+
+            const uploadData = await uploadResponse.json();
+            const itemId = uploadData.message.split("itemId ")[1];
+
+            const categoryResponse = await fetch(`http://localhost:8080/category`);
+            const categories = await categoryResponse.json();
+            const category = categories.find(cat => cat.name === categoryName);
+            const categoryId = category ? category.id : null;
+
+            if (!categoryId) {
+                throw new Error("Invalid category name");
+            }
+
+            const updateResponse = await fetch(`http://localhost:8080/items/update/${itemId}/${categoryId}`, {
+                method: "PUT",
+            });
+
+            if (updateResponse.ok) {
+                alert("Item updated and category set successfully!");
+                window.location.href = "main.html";
+            } else {
+                throw new Error("Failed to update item category");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Failed to update item");
+        }
     }
 
     function deleteItem() {
-        alert("Item deleted");
-        window.location.href = "main.html"; // Return to main view
+        const itemId = '/* Hier die itemId des zu löschenden Elements einfügen */';
+        fetch(`http://localhost:8080/items/delete/${itemId}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Item deleted successfully!');
+                    window.location.href = 'main.html';
+                } else {
+                    throw new Error('Failed to delete item');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to delete item');
+            });
     }
-
-    window.onload = loadItemData;
 </script>
 </body>
 </html>
+
 
