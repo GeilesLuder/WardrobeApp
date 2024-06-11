@@ -55,10 +55,10 @@
         }
     }
 
-    async function showItems(customerMail) {
-        console.log('User email:', customerMail); // Debug log
-        if (!customerMail) {
-            console.error('User email is undefined.');
+    async function showItems(categoryId) {
+        console.log('Category ID:', categoryId); // Debug log
+        if (!categoryId || !userEmail) {
+            console.error('Category ID or user email is undefined.');
             return;
         }
 
@@ -66,7 +66,7 @@
         itemsContainer.innerHTML = ""; // Clear current items
 
         try {
-            const response = await fetch(`http://localhost:8080/items/${customerMail}`);
+            const response = await fetch(`http://localhost:8080/category/${categoryId}/${userEmail}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

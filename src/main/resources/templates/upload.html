@@ -11,46 +11,38 @@
     <div class="main-content-upload">
         <h2>Upload Item</h2>
         <div class="image-container">
-            <img
-                    id="item-image"
-                    src="placeholder.jpg"
-                    alt="Item Image"
-                    style="max-width: 100%; height: auto"
-            />
+            <img id="item-image" src="placeholder.jpg" alt="Item Image" style="max-width: 100%; height: auto" />
         </div>
         <input type="file" id="file-input" accept="image/*" />
-        <div class="category">
-            <span id="category-label">Category:</span>
-            <span id="category-name" contenteditable="true"
-            >Click to set category</span
-            >
+        <div class="input-group">
+            <label for="category-name">Category:</label>
+            <span id="category-name" contenteditable="true">Click to set category</span>
+        </div>
+        <div class="input-group">
+            <label for="item-name-input">Item Name:</label>
+            <input type="text" id="item-name-input" placeholder="Enter item name" />
         </div>
     </div>
     <div class="action-bar">
         <button onclick="uploadImage()">Upload</button>
         <button onclick="snipImage()">Snip</button>
-        <button onclick="getCategory()">getCat</button>
+        <button onclick="getCategory()">Get Category</button>
         <button onclick="saveItem()">Add</button>
-        <button class="delete-button" onclick="deleteItem()">
-            Discard
-        </button>
+        <button class="delete-button" onclick="deleteItem()">Discard</button>
     </div>
 </div>
 
 <script>
-    document
-        .getElementById("file-input")
-        .addEventListener("change", function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById("item-image").src =
-                        e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+    document.getElementById("file-input").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("item-image").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
     function uploadImage() {
         const fileInput = document.getElementById("file-input");
@@ -83,9 +75,38 @@
         alert("Get Category");
     }
 
-    function saveItem() {
-        alert("Item Added");
-        window.location.href = "main.html"; // Return to main view
+    async function saveItem() {
+        const fileInput = document.getElementById("file-input");
+        const file = fileInput.files[0];
+        const itemName = document.getElementById("item-name-input").value;
+        const categoryName = document.getElementById("category-name").innerText;
+        const userEmail = localStorage.getItem('userEmail');
+
+        if (!file || !itemName || !categoryName) {
+            alert("Please fill out all fields and select an image.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("itemName", itemName);
+        formData.append("categoryName", categoryName);
+
+        try {
+            const response = await fetch(`http://localhost:8080/upload/${userEmail}`, {
+                method: "POST",
+                body: formData,
+            });
+            if (response.ok) {
+                alert("Item added successfully!");
+                window.location.href = "main.html";
+            } else {
+                throw new Error("Failed to add item");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Failed to add item");
+        }
     }
 
     function deleteItem() {
