@@ -66,7 +66,7 @@ public class ClothingController {
       // create new item and set variables
       Item newItem = new Item();
       newItem.setName(file.getOriginalFilename());
-
+      newItem.setCategory(categoryService.getCategoryByName("Shorts"));
       newItem.setCustomer(currUser.get());
       Picture pic = new Picture();
       // process image
@@ -107,9 +107,10 @@ public class ClothingController {
 
   
   @GetMapping("/category/{categoryId}/{customerMail}")
-  public List<Item> getCategories(@PathVariable Long categoryId, @PathVariable String customerMail) {
+  public List<Item> getCategories(@PathVariable String categoryId, @PathVariable String customerMail) {
+    System.out.println("Category id: " + categoryId + "---------------------------------------------------------------------");
 
-    return itemService.getItemsByUserIdAndCategoryId(customerService.getUserByEmail(customerMail).get().getId(), categoryId);
+    return itemService.getItemsByUserIdAndCategoryId(customerService.getUserByEmail(customerMail).get().getId(),Integer.toUnsignedLong(2));
   }
 
   // Update the category of an item
