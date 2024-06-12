@@ -32,10 +32,7 @@ public class CustomerService {
     public Boolean loginUser(String email, String password) {
         Optional<Customer> userOpt = customerRepository.findByEmail(email);
         if (userOpt.isPresent()) {
-            Customer customer = userOpt.get();
-            if (customer.getPassword().equals(password)) {
-                return true;
-            }
+            return userOpt.get().getPassword().equals(password);
         }
         return false;
     }
