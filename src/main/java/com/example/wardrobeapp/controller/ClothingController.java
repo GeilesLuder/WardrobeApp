@@ -3,6 +3,7 @@ package com.example.wardrobeapp.controller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,12 +106,23 @@ public class ClothingController {
   }
 
 
-  
+
   @GetMapping("/category/{categoryId}/{customerMail}")
   public List<Item> getCategories(@PathVariable String categoryId, @PathVariable String customerMail) {
-    System.out.println("Category id: " + categoryId + "---------------------------------------------------------------------");
+    System.out.println("Category ID received: " + categoryId);
+    System.out.println("Customer email received: " + customerMail);
 
-    return itemService.getItemsByUserIdAndCategoryId(customerService.getUserByEmail(customerMail).get().getId(),Integer.toUnsignedLong(2));
+    Long categoryIdLong;
+    try {
+      categoryIdLong = Long.parseLong(categoryId);
+    } catch (NumberFormatException e) {
+      System.err.println("Failed to convert categoryId to Long: " + categoryId);
+      return Collections.emptyList(); // Or handle the error appropriately
+    }
+
+    System.out.println("Converted Category ID: " + categoryIdLong);
+
+    return itemService.getItemsByUserIdAndCategoryId(customerService.getUserByEmail(customerMail).get().getId(), categoryIdLong);
   }
 
   // Update the category of an item
