@@ -65,8 +65,7 @@
 
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("itemName", itemName);
-        formData.append("categoryName", categoryName);
+        formData.append("customerMail", userEmail);
 
         try {
             const uploadResponse = await fetch(`http://localhost:8080/upload/${userEmail}`, {
@@ -105,6 +104,7 @@
             alert("Failed to add item");
         }
     }
+
 
     function discard() {
         window.location.href = "main.html"; // Return to main view without saving

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Main Page</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="container">
+    <div class="sidebar">
+        <h2>Categories</h2>
+        <ul>
+            <li>
+                <a href="#" onclick="showItems('bottoms')">Bottoms</a>
+            </li>
+            <li><a href="#" onclick="showItems('tops')">Tops</a></li>
+            <li>
+                <a href="#" onclick="showItems('dresses')">Dresses</a>
+            </li>
+        </ul>
+    </div>
+    <div class="topbar">
+        <h1>Items</h1>
+        <button class="logout-button" onclick="logout()">Logout</button>
+    </div>
+    <div class="main-content">
+        <div id="items" class="items-container"></div>
+    </div>
+    <div class="add-item" onclick="addItem()">+</div>
+</div>
+
+<script>
+    function showItems(category) {
+        const itemsContainer = document.getElementById("items");
+        itemsContainer.innerHTML = ""; // Clear current items
+
+        // Example items for each category
+        const items = {
+            bottoms: [
+                { name: "Jeans", image: "./test/jeans.jpg" },
+                { name: "Shorts", image: "./test/shorts.jpg" },
+            ],
+            tops: [
+                { name: "Name Top", image: "./testImages/jeans.jpg" },
+                { name: "my cool Top", image: "./testImages/shorts.jpg" },
+                { name: "my long shirt", image: "./testImages/transparent.png" },
+                { name: "gray T-Shirt", image: "./test/top4.jpg" },
+            ],
+            dresses: [
+                {
+                    name: "Transparent",
+                    image: "./test/transparent.png",
+                },
+                { name: "Dress2", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+                { name: "Dress1", image: "" },
+            ],
+        };
+
+        if (items[category]) {
+            items[category].forEach((item) => {
+                const itemElement = document.createElement("div");
+                itemElement.className = "item";
+                itemElement.innerHTML = `<img src="${item.image}" alt="${item.name}" class="item-img"/><div class="item-name">${item.name}</div>`;
+                itemElement.onclick = () => editView(item);
+                itemsContainer.appendChild(itemElement);
+            });
+        }
+    }
+
+    function addItem() {
+        window.location.href = "upload.html"; // Navigate to upload view
+    }
+
+    function editView(item) {
+        window.location.href = "edit.html";
+    }
+
+    function logout() {
+        window.location.href = "index.html";
+    }
+</script>
+</body>
+</html>
