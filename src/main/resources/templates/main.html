@@ -32,7 +32,7 @@
         window.location.href = 'index.html'; // Redirect to login if userEmail is not found
     }
 
-    async function loadCategories(){
+    async function loadCategories() {
         try {
             const response = await fetch('http://localhost:8080/category');
             if (!response.ok) {
@@ -41,12 +41,15 @@
             const categories = await response.json();
             const categoryList = document.getElementById('category-list');
             categoryList.innerHTML = ''; // Clear previous categories
-            categories.forEach(category => {
+            categories.forEach((category, index) => {
                 const listItem = document.createElement('li');
                 const link = document.createElement('a');
                 link.href = '#';
                 link.textContent = category.name;
-                link.onclick = () => showItems(category.id);
+                link.onclick = () => {
+                    console.log("Category clicked:", index); // Debugging-Ausgabe
+                    showItems(index);
+                };
                 listItem.appendChild(link);
                 categoryList.appendChild(listItem);
             });
@@ -55,20 +58,26 @@
         }
     }
 
-    async function showItems(categoryId) {
+    async function showItems(categoryIndex) {
+        console.log("Category Index in showItems:", categoryIndex); // Debugging-Ausgabe
+
         const itemsContainer = document.getElementById("items");
         itemsContainer.innerHTML = ""; // Clear current items
 
         try {
-            const response = await fetch(`http://localhost:8080/category/{{categoryId}}/{{customerMail}}`);
+            const customerMail = localStorage.getItem('userEmail');
+            console.log("Customer Email:", customerMail); // Debugging-Ausgabe
+
+            const response = await fetch(`http://localhost:8080/category/${categoryIndex}/${customerMail}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch items");
             }
 
             const items = await response.json();
+            console.log("Items fetched:", items); // Debugging-Ausgabe
 
             for (const item of items) {
-                const itemImageResponse = await fetch(`http://localhost:8080/download/{{itemId}}`);
+                const itemImageResponse = await fetch(`http://localhost:8080/download/${item.id}`);
                 if (!itemImageResponse.ok) {
                     throw new Error(`Failed to fetch image for item ${item.id}`);
                 }
@@ -78,8 +87,8 @@
                 const itemElement = document.createElement("div");
                 itemElement.className = "item";
                 itemElement.innerHTML = `
-                <img src="${itemImageUrl}" alt="${item.name}" class="item-img"/>
-                <div class="item-name">${item.name}</div>`;
+            <img src="${itemImageUrl}" alt="${item.name}" class="item-img"/>
+            <div class="item-name">${item.name}</div>`;
                 itemElement.onclick = () => editView(item);
                 itemsContainer.appendChild(itemElement);
             }
@@ -88,8 +97,6 @@
             alert("Failed to load items");
         }
     }
-
-
 
 
 
@@ -110,5 +117,6 @@
 </script>
 </body>
 </html>
+
 
 

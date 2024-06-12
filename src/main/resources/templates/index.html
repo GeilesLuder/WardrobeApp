@@ -36,15 +36,9 @@
     <input type="password" id="password" name="password" required>
     <input type="submit" value="Login">
     <div id="errorMessage" class="error">Invalid email or password</div>
-    <div class="" onclick="redirectToMain()">Go</div>
 </form>
 
 <script>
-    function redirectToMain() {
-        // kann dann weg
-        window.location.href = 'main.html';
-    }
-
     document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
