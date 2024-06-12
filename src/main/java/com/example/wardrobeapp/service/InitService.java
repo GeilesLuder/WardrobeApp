@@ -83,7 +83,7 @@ public class InitService {
         pictureService.save(picture2);
 
         Picture picture3 = new Picture();
-        picture3.setFile(new File("C:\\Users\\neuba\\IdeaProjects\\WardrobeApp\\src\\main\\resources\\pictures\\shoes.png"));
+        picture3.setFile(new File("C:\\Users\\neuba\\IdeaProjects\\WardrobeApp\\src\\main\\resources\\pictures\\shoes.jpg"));
         pictureService.save(picture3);
 
         Picture picture4 = new Picture();
@@ -101,7 +101,7 @@ public class InitService {
         itemService.saveItem(item1);
 
         Item item2 = new Item();
-        item2.setCategory(category1);
+        item2.setCategory(category5);
         item2.setPicture(picture2);
         item2.setName("Cute black dress");
         item2.setCustomer(customer1);

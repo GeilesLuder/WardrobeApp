@@ -48,7 +48,7 @@
                 link.textContent = category.name;
                 link.onclick = () => {
                     console.log("Category clicked:", index); // Debugging-Ausgabe
-                    showItems(index);
+                    showItems(index + 1);
                 };
                 listItem.appendChild(link);
                 categoryList.appendChild(listItem);
