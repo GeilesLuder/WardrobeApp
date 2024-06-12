@@ -15,12 +15,12 @@
         </div>
         <input type="file" id="file-input" accept="image/*" />
         <div class="input-group">
-            <label for="category-name">Category:</label>
-            <span id="category-name" contenteditable="true">Click to set category</span>
+            <label for="item-name-input">Item Name:</label>
+            <input type="text" id="item-name-input" />
         </div>
         <div class="input-group">
-            <label for="item-name-input">Item Name:</label>
-            <input type="text" id="item-name-input" placeholder="Enter item name" />
+            <label for="category-name">Category:</label>
+            <span id="category-name" contenteditable="true">Click to set category</span>
         </div>
     </div>
     <div class="action-bar">
@@ -78,7 +78,7 @@
             }
 
             const uploadData = await uploadResponse.json();
-            const itemId = uploadData.message.split("itemId ")[1];
+            const itemId = uploadData.message.split(" itemId ")[1];
 
             const categoryResponse = await fetch(`http://localhost:8080/category`);
             const categories = await categoryResponse.json();
@@ -93,17 +93,18 @@
                 method: "PUT",
             });
 
-            if (updateResponse.ok) {
-                alert("Item added and category set successfully!");
-                window.location.href = "main.html";
-            } else {
+            if (!updateResponse.ok) {
                 throw new Error("Failed to update item category");
             }
+
+            alert("Item added and category set successfully!");
+            window.location.href = "main.html";
         } catch (error) {
             console.error("Error:", error);
-            alert("Failed to add item");
+            alert("Failed to add item: " + error.message);
         }
     }
+
 
 
     function discard() {

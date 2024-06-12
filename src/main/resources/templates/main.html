@@ -105,6 +105,7 @@
     }
 
     function editView(item) {
+        localStorage.setItem('currentItem', JSON.stringify(item)); // Den ausgewählten Artikel im Local Storage speichern
         window.location.href = "edit.html";
     }
 

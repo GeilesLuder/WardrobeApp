@@ -33,12 +33,16 @@
 </div>
 
 <script>
+    let currentItem;
+    let currentImage;
+
     document.getElementById("file-input").addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function (e) {
                 document.getElementById("item-image").src = e.target.result;
+                currentImage = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -52,85 +56,84 @@
         document.getElementById("category-name").innerText = "Clothing";
     }
 
-    function discard() {
-        window.location.href = "main.html"; // Return to main view without saving
-    }
-
     async function saveChanges() {
-        const fileInput = document.getElementById("file-input");
-        const file = fileInput.files[0];
-        const itemName = document.getElementById("item-name-input").value;
-        const categoryName = document.getElementById("category-name").innerText;
-        const userEmail = localStorage.getItem('userEmail');
-
-        if (!file || !itemName || !categoryName) {
-            alert("Please fill out all fields and select an image.");
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("itemName", itemName);
-        formData.append("categoryName", categoryName);
-
+        const newName = document.getElementById("item-name-input").value;
         try {
-            const uploadResponse = await fetch(`http://localhost:8080/upload/${userEmail}`, {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!uploadResponse.ok) {
-                throw new Error("Failed to upload file");
-            }
-
-            const uploadData = await uploadResponse.json();
-            const itemId = uploadData.message.split("itemId ")[1];
-
-            const categoryResponse = await fetch(`http://localhost:8080/category`);
-            const categories = await categoryResponse.json();
-            const category = categories.find(cat => cat.name === categoryName);
-            const categoryId = category ? category.id : null;
-
-            if (!categoryId) {
-                throw new Error("Invalid category name");
-            }
-
-            const updateResponse = await fetch(`http://localhost:8080/items/update/${itemId}/${categoryId}`, {
-                method: "PUT",
-            });
-
-            if (updateResponse.ok) {
-                alert("Item updated and category set successfully!");
-                window.location.href = "main.html";
+            // Überprüfe, ob sich der Name geändert hat
+            if (newName !== currentItem.name) {
+                // Setze nur den Namen des aktuellen Elements
+                currentItem.name = newName;
+                // Sende den aktualisierten Namen an den Server
+                const response = await fetch(`http://localhost:8080/items/update/${currentItem.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: newName
+                    }),
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to update item name');
+                }
+                alert('Item name updated successfully');
             } else {
-                throw new Error("Failed to update item category");
+                alert('No changes detected');
             }
         } catch (error) {
-            console.error("Error:", error);
-            alert("Failed to update item");
+            console.error('Error updating item name:', error);
+            alert('Failed to update item name');
         }
     }
 
-    function deleteItem() {
-        const itemId = '/* Hier die itemId des zu löschenden Elements einfügen */';
-        fetch(`http://localhost:8080/items/delete/${itemId}`, {
-            method: 'DELETE',
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert('Item deleted successfully!');
-                    window.location.href = 'main.html';
-                } else {
+
+
+
+
+
+
+    async function deleteItem() {
+        if (confirm('Are you sure you want to delete this item?')) {
+            try {
+                const response = await fetch(`http://localhost:8080/delete/${currentItem.id}`);
+                if (!response.ok) {
                     throw new Error('Failed to delete item');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
+                alert('Item deleted successfully');
+                window.location.href = "main.html";
+            } catch (error) {
+                console.error('Error deleting item:', error);
                 alert('Failed to delete item');
-            });
+            }
+        }
+    }
+
+    function discard() {
+        window.location.href = "main.html";
+    }
+
+    function initEditView(item) {
+        currentItem = item;
+        // Stelle sicher, dass der korrekte Bild-URL verwendet wird
+        currentImage = `http://localhost:8080/download/${item.id}`;
+        document.getElementById("item-image").src = currentImage;
+        document.getElementById("item-name-input").value = item.name;
+        document.getElementById("category-name").innerText = item.category.name;
+    }
+
+
+    window.onload = function() {
+        const currentItem = JSON.parse(localStorage.getItem('currentItem'));
+        if (currentItem) {
+            initEditView(currentItem);
+        } else {
+            console.error('Current item not found in local storage.');
+            window.location.href = 'main.html';
+        }
     }
 </script>
 </body>
 </html>
+
 
 
