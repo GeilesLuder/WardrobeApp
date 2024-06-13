@@ -66,7 +66,9 @@ public class ClothingController {
       Optional<Customer> currUser = customerService.getUserByEmail(customerMail);
       // create new item and set variables
       Item newItem = new Item();
-      newItem.setName(file.getOriginalFilename());
+      String fileName = file.getOriginalFilename();
+      String result = fileName.substring(0, fileName.indexOf("."));
+      newItem.setName(result);
       newItem.setCategory(categoryService.getCategoryByName("Shorts"));
       newItem.setCustomer(currUser.get());
       Picture pic = new Picture();
