@@ -69,7 +69,7 @@ public class ClothingController {
       String fileName = file.getOriginalFilename();
       String result = fileName.substring(0, fileName.indexOf("."));
       newItem.setName(result);
-      newItem.setCategory(categoryService.getCategoryByName("Shorts"));
+      newItem.setCategory(categoryService.getAll().get(4));
       newItem.setCustomer(currUser.get());
       Picture pic = new Picture();
       // process image
