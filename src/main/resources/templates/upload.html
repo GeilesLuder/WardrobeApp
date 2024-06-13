@@ -19,8 +19,10 @@
             <input type="text" id="item-name-input" />
         </div>
         <div class="input-group">
-            <label for="category-name">Category:</label>
-            <span id="category-name" contenteditable="true">Click to set category</span>
+            <label for="category-select">Category:</label>
+            <select id="category-select">
+                <!-- Options will be populated by JavaScript -->
+            </select>
         </div>
     </div>
     <div class="action-bar">
@@ -32,6 +34,8 @@
 </div>
 
 <script>
+    let categories = [];
+
     document.getElementById("file-input").addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (file) {
@@ -43,22 +47,38 @@
         }
     });
 
-    function snipImage() {
-        alert("Snip Out");
+    async function fetchCategories() {
+        try {
+            const response = await fetch('http://localhost:8080/category');
+            if (!response.ok) {
+                throw new Error('Failed to fetch categories');
+            }
+            categories = await response.json(); // Store the categories
+            populateCategoryDropdown(categories);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        }
     }
 
-    function getCategory() {
-        document.getElementById("category-name").innerText = "Clothing";
+    function populateCategoryDropdown(categories) {
+        const categorySelect = document.getElementById('category-select');
+        categorySelect.innerHTML = ''; // Clear existing options
+        categories.forEach((category, index) => {
+            const option = document.createElement('option');
+            option.value = index; // Use index as the value
+            option.textContent = category.name;
+            categorySelect.appendChild(option);
+        });
     }
 
     async function saveItem() {
         const fileInput = document.getElementById("file-input");
         const file = fileInput.files[0];
         const itemName = document.getElementById("item-name-input").value;
-        const categoryName = document.getElementById("category-name").innerText;
+        const selectedIndex = document.getElementById("category-select").value;
         const userEmail = localStorage.getItem('userEmail');
 
-        if (!file || !itemName || !categoryName) {
+        if (!file || !itemName || selectedIndex === '') {
             alert("Please fill out all fields and select an image.");
             return;
         }
@@ -78,16 +98,9 @@
             }
 
             const uploadData = await uploadResponse.json();
-            const itemId = uploadData.message.split(" itemId ")[1];
+            const itemId = uploadData.itemId; // Assuming backend provides itemId directly
 
-            const categoryResponse = await fetch(`http://localhost:8080/category`);
-            const categories = await categoryResponse.json();
-            const category = categories.find(cat => cat.name === categoryName);
-            const categoryId = category ? category.id : null;
-
-            if (!categoryId) {
-                throw new Error("Invalid category name");
-            }
+            const categoryId = parseInt(selectedIndex) + 1; // Use index + 1 as the categoryId
 
             const updateResponse = await fetch(`http://localhost:8080/items/update/${itemId}/${categoryId}`, {
                 method: "PUT",
@@ -106,9 +119,26 @@
     }
 
 
+    function snipImage() {
+        alert("Snip Out");
+    }
+
+    function getCategory() {
+        const categorySelect = document.getElementById('category-select');
+        const shortsIndex = categories.findIndex(cat => cat.name.toLowerCase() === 'shorts');
+        if (shortsIndex !== -1) {
+            categorySelect.value = shortsIndex;
+        } else {
+            alert('Category "Shorts" not found.');
+        }
+    }
 
     function discard() {
         window.location.href = "main.html"; // Return to main view without saving
+    }
+
+    window.onload = function() {
+        fetchCategories(); // Fetch categories when the page loads
     }
 </script>
 </body>
