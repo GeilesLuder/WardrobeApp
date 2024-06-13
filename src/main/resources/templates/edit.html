@@ -67,11 +67,9 @@
 
     async function saveChanges() {
         const selectedIndex = document.getElementById('category-select').value;
-        const selectedCategory = categories[selectedIndex]; // Get the category by index
-        const itemName = document.getElementById('item-name-input').value;
+        const itemName = document.getElementById('item-name-input').value; // Updated item name
 
         const updatedItem = {
-            name: itemName,
             categoryId: parseInt(selectedIndex) + 1 // Use index + 1 as the categoryId
         };
 
@@ -93,6 +91,8 @@
             alert('Failed to save changes');
         }
     }
+
+
 
     async function deleteItem() {
         if (confirm('Are you sure you want to delete this item?')) {
@@ -165,7 +165,3 @@
 </script>
 </body>
 </html>
-
-
-
-

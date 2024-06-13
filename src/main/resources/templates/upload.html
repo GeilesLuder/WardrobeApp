@@ -97,26 +97,42 @@
                 throw new Error("Failed to upload file");
             }
 
-            const uploadData = await uploadResponse.json();
-            const itemId = uploadData.itemId; // Assuming backend provides itemId directly
+            // Get the list of items for the user
+            const itemsResponse = await fetch(`http://localhost:8080/items/${userEmail}`);
+            if (!itemsResponse.ok) {
+                throw new Error("Failed to fetch items");
+            }
 
-            const categoryId = parseInt(selectedIndex) + 1; // Use index + 1 as the categoryId
+            const items = await itemsResponse.json();
 
-            const updateResponse = await fetch(`http://localhost:8080/items/update/${itemId}/${categoryId}`, {
-                method: "PUT",
+            // Find the most recent item (last item in the list)
+            const mostRecentItem = items[items.length - 1];
+            const itemId = mostRecentItem.id;
+
+            const updatedItem = {
+                categoryId: parseInt(selectedIndex) + 1 // Use index + 1 as the categoryId
+            };
+
+            const updateResponse = await fetch(`http://localhost:8080/items/update/${itemId}/${updatedItem.categoryId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedItem)
             });
 
             if (!updateResponse.ok) {
-                throw new Error("Failed to update item category");
+                throw new Error('Failed to save category');
             }
 
-            alert("Item added and category set successfully!");
+            alert('Item updated successfully');
             window.location.href = "main.html";
         } catch (error) {
-            console.error("Error:", error);
-            alert("Failed to add item: " + error.message);
+            console.error('Error:', error);
+            alert('Failed to add item: ' + error.message);
         }
     }
+
 
 
     function snipImage() {
@@ -143,4 +159,3 @@
 </script>
 </body>
 </html>
-
