@@ -20,13 +20,8 @@
                 <!-- Options will be populated by JavaScript -->
             </select>
         </div>
-        <div class="input-group">
-            <label for="item-name-input">Item Name:</label>
-            <input type="text" id="item-name-input" placeholder="Enter item name" />
-        </div>
     </div>
     <div class="action-bar">
-        <button onclick="snipImage()">Snip</button>
         <button onclick="getCategory()">Get Category</button>
         <button onclick="saveChanges()">Save Changes</button>
         <button onclick="deleteItem()">Delete</button>
@@ -51,10 +46,6 @@
         }
     });
 
-    function snipImage() {
-        alert("Snip Out");
-    }
-
     function getCategory() {
         const categorySelect = document.getElementById('category-select');
         const shortsIndex = categories.findIndex(cat => cat.name.toLowerCase() === 'shorts');
@@ -67,7 +58,6 @@
 
     async function saveChanges() {
         const selectedIndex = document.getElementById('category-select').value;
-        const itemName = document.getElementById('item-name-input').value; // Updated item name
 
         const updatedItem = {
             categoryId: parseInt(selectedIndex) + 1 // Use index + 1 as the categoryId
@@ -91,8 +81,6 @@
             alert('Failed to save changes');
         }
     }
-
-
 
     async function deleteItem() {
         if (confirm('Are you sure you want to delete this item?')) {

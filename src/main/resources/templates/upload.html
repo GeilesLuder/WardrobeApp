@@ -15,10 +15,6 @@
         </div>
         <input type="file" id="file-input" accept="image/*" />
         <div class="input-group">
-            <label for="item-name-input">Item Name:</label>
-            <input type="text" id="item-name-input" />
-        </div>
-        <div class="input-group">
             <label for="category-select">Category:</label>
             <select id="category-select">
                 <!-- Options will be populated by JavaScript -->
@@ -26,7 +22,6 @@
         </div>
     </div>
     <div class="action-bar">
-        <button onclick="snipImage()">Snip</button>
         <button onclick="getCategory()">Get Category</button>
         <button onclick="saveItem()">Add</button>
         <button class="delete-button" onclick="discard()">Discard</button>
@@ -74,11 +69,10 @@
     async function saveItem() {
         const fileInput = document.getElementById("file-input");
         const file = fileInput.files[0];
-        const itemName = document.getElementById("item-name-input").value;
         const selectedIndex = document.getElementById("category-select").value;
         const userEmail = localStorage.getItem('userEmail');
 
-        if (!file || !itemName || selectedIndex === '') {
+        if (!file || selectedIndex === '') {
             alert("Please fill out all fields and select an image.");
             return;
         }
@@ -131,12 +125,6 @@
             console.error('Error:', error);
             alert('Failed to add item: ' + error.message);
         }
-    }
-
-
-
-    function snipImage() {
-        alert("Snip Out");
     }
 
     function getCategory() {
