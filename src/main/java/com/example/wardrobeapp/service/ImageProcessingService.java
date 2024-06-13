@@ -1,5 +1,5 @@
 package com.example.wardrobeapp.service;
-// For image snipping and stuff
+
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -14,6 +14,11 @@ import java.util.List;
 
 @Service
 public class ImageProcessingService {
+
+    static {
+        // Load OpenCV native library
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    }
 
     public File processImage(MultipartFile file) throws IOException {
         // Save the uploaded file to a temporary location
@@ -33,11 +38,6 @@ public class ImageProcessingService {
         // Apply Gaussian blur to the image
         Imgproc.GaussianBlur(gray, gray, new Size(5, 5), 0);
 
-        //maybe we'll need this
-        /* Apply edge detection
-        Mat edges = new Mat();
-        Imgproc.Canny(gray, edges, 75, 200);*/
-
         // Apply adaptive thresholding
         Mat thresh = new Mat();
         Imgproc.adaptiveThreshold(gray, thresh, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 11, 2);
@@ -48,30 +48,49 @@ public class ImageProcessingService {
         Imgproc.morphologyEx(thresh, thresh, Imgproc.MORPH_OPEN, kernel);
 
         // Find contours
-        List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
+        List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(thresh, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        // Draw contours on a new image
-        Mat result = Mat.zeros(src.size(), src.type());
+        // Find the largest contour which is most likely the T-shirt
+        double largestArea = 0;
+        MatOfPoint largestContour = null;
         for (MatOfPoint contour : contours) {
-            Rect boundingRect = Imgproc.boundingRect(contour);
-            Mat contourRegion = thresh.submat(boundingRect);
-            double contourArea = Imgproc.contourArea(contour);
-
-            // Filter out small contours
-            if (contourArea > 500) {
-                Imgproc.drawContours(result, List.of(contour), -1, new Scalar(0, 255, 0), 2);
+            double area = Imgproc.contourArea(contour);
+            if (area > largestArea) {
+                largestArea = area;
+                largestContour = contour;
             }
         }
 
-        // Save the result to a new file
-        File resultFile = File.createTempFile("processed-", ".jpg");
-        Imgcodecs.imwrite(resultFile.getAbsolutePath(), result);
+        if (largestContour != null) {
+            // Draw the largest contour on a mask
+            Mat mask = Mat.zeros(src.size(), CvType.CV_8UC1);
+            Imgproc.drawContours(mask, List.of(largestContour), -1, new Scalar(255), -1);
 
-        // Clean up temporary files
-        Files.delete(tempFile.toPath());
+            // Apply GrabCut algorithm
+            Mat bgdModel = new Mat();
+            Mat fgdModel = new Mat();
+            Rect rect = Imgproc.boundingRect(largestContour);
+            Mat resultMask = new Mat();
+            Imgproc.grabCut(src, resultMask, rect, bgdModel, fgdModel, 5, Imgproc.GC_INIT_WITH_RECT);
 
-        return resultFile;
+            // Prepare the mask for extracting the foreground
+            Core.compare(resultMask, new Scalar(Imgproc.GC_PR_FGD), resultMask, Core.CMP_EQ);
+
+            Mat foreground = new Mat(src.size(), CvType.CV_8UC3, new Scalar(255, 255, 255));
+            src.copyTo(foreground, resultMask);
+
+            // Save the result to a new file
+            File resultFile = File.createTempFile("processed-", ".jpg");
+            Imgcodecs.imwrite(resultFile.getAbsolutePath(), foreground);
+
+            // Clean up temporary files
+            Files.delete(tempFile.toPath());
+
+            return resultFile;
+        } else {
+            throw new IOException("No contours found in the image");
+        }
     }
 }
