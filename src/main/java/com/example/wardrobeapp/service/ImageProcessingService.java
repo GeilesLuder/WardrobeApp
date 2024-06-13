@@ -54,7 +54,16 @@ public class ImageProcessingService {
 
         // Draw contours on a new image
         Mat result = Mat.zeros(src.size(), src.type());
-        Imgproc.drawContours(result, contours, -1, new Scalar(0, 255, 0), 2);
+        for (MatOfPoint contour : contours) {
+            Rect boundingRect = Imgproc.boundingRect(contour);
+            Mat contourRegion = thresh.submat(boundingRect);
+            double contourArea = Imgproc.contourArea(contour);
+
+            // Filter out small contours
+            if (contourArea > 500) {
+                Imgproc.drawContours(result, List.of(contour), -1, new Scalar(0, 255, 0), 2);
+            }
+        }
 
         // Save the result to a new file
         File resultFile = File.createTempFile("processed-", ".jpg");
