@@ -33,18 +33,28 @@ public class ImageProcessingService {
         // Apply Gaussian blur to the image
         Imgproc.GaussianBlur(gray, gray, new Size(5, 5), 0);
 
-        // Apply edge detection
+        //maybe we'll need this
+        /* Apply edge detection
         Mat edges = new Mat();
-        Imgproc.Canny(gray, edges, 75, 200);
+        Imgproc.Canny(gray, edges, 75, 200);*/
+
+        // Apply adaptive thresholding
+        Mat thresh = new Mat();
+        Imgproc.adaptiveThreshold(gray, thresh, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 11, 2);
+
+        // Apply morphological operations to remove small noises and enhance the object
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+        Imgproc.morphologyEx(thresh, thresh, Imgproc.MORPH_CLOSE, kernel);
+        Imgproc.morphologyEx(thresh, thresh, Imgproc.MORPH_OPEN, kernel);
 
         // Find contours
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
-        Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(thresh, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         // Draw contours on a new image
         Mat result = Mat.zeros(src.size(), src.type());
-        Imgproc.drawContours(result, contours, -1, new Scalar(0, 255, 0));
+        Imgproc.drawContours(result, contours, -1, new Scalar(0, 255, 0), 2);
 
         // Save the result to a new file
         File resultFile = File.createTempFile("processed-", ".jpg");
